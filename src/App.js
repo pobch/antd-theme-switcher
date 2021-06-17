@@ -1,29 +1,47 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Typography, Card, Layout } from 'antd'
-// import './App.less'
-import './App.light.less'
-import './App.dark.less'
+
+const LightTheme = React.lazy(() => import('./Light'))
+const DarkTheme = React.lazy(() => import('./Dark'))
+
+const TYPE_OF_THEME = {
+  DEFAULT: 'light',
+  LIGHT_MODE: 'light',
+  DARK_MODE: 'dark',
+}
 
 function App() {
   const [isLight, setIsLight] = useState(true)
-
-  useEffect(() => {
-    if (!isLight) {
-      document.querySelector('body').style.backgroundColor = '#000'
-    } else {
-      document.querySelector('body').style.backgroundColor = 'white'
-    }
-  }, [isLight])
+  const CHOSEN_THEME = localStorage.getItem('TYPE_OF_THEME') || TYPE_OF_THEME.DEFAULT
 
   return (
-    <div className={isLight ? 'pob-light' : 'pob-dark'}>
+    <div>
+      <React.Suspense fallback={<></>}>
+        {CHOSEN_THEME === TYPE_OF_THEME.LIGHT_MODE && <LightTheme />}
+        {CHOSEN_THEME === TYPE_OF_THEME.DARK_MODE && <DarkTheme />}
+      </React.Suspense>
       <Layout>
-        <Layout.Header>Web App</Layout.Header>
+        <Layout.Header style={{ color: 'hotpink' }}>Web App</Layout.Header>
         <Layout>
-          <Layout.Sider>Menu</Layout.Sider>
+          <Layout.Sider theme={CHOSEN_THEME}>Menu</Layout.Sider>
           <Layout.Content>
-            <Button type="primary" onClick={() => setIsLight(!isLight)}>
-              Switch Theme
+            <Button
+              type="primary"
+              onClick={() => {
+                localStorage.setItem('TYPE_OF_THEME', TYPE_OF_THEME.LIGHT_MODE)
+                window.location.reload()
+              }}
+            >
+              Light
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                localStorage.setItem('TYPE_OF_THEME', TYPE_OF_THEME.DARK_MODE)
+                window.location.reload()
+              }}
+            >
+              Dark
             </Button>
             <Typography.Title level={1}>Some Heading Text</Typography.Title>
             <Typography.Paragraph>lorum ipsum</Typography.Paragraph>
